@@ -68,6 +68,7 @@ public class Team2 extends AdvancedRobot {
     //当机器人被炮弹击中
     public void onHitByBullet(HitByBulletEvent e)
     {
+        setTurnRadarRight(400);
         if(getX()>150&&getY()>150&&enemy.x-getX()>150&&enemy.y-getY()>150)
         {
             double dist=150;
@@ -135,8 +136,8 @@ public class Team2 extends AdvancedRobot {
     }
 
     public void smartFire() {
-        FIRE_POWER =3;
-        //FIRE_POWER = Math.min(Math.min(getEnergy() / 6d, 1000d / enemy.distance), enemy.energy / 3d);
+        //FIRE_POWER =3;
+        FIRE_POWER = Math.min(Math.min(getEnergy() / 6d, 1000d / enemy.distance), enemy.energy / 3d);
         FIRE_SPEED = Rules.getBulletSpeed(FIRE_POWER);
         setFire(FIRE_POWER);
     }
