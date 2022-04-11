@@ -55,6 +55,7 @@ public class Team2 extends AdvancedRobot {
 
 
     public void onHitWall(HitWallEvent e) {
+        setTurnRadarRight(400);
         if (Math.abs(movement) > BASE_MOVEMENT) {
             movement = BASE_MOVEMENT;
         }
@@ -121,6 +122,7 @@ public class Team2 extends AdvancedRobot {
         predictions.clear();
         Point2D.Double myP = new Point2D.Double(getX(), getY());
         Point2D.Double enemyP = project(myP, enemy.absoluteBearing, e.getDistance());
+        doMovement(e);
         String pattern = enemyHistory;
         for (double d = 0; d < myP.distance(enemyP); d += FIRE_SPEED) {
             int nextStep = predict(pattern);
@@ -136,10 +138,24 @@ public class Team2 extends AdvancedRobot {
     }
 
     public void smartFire() {
-        //FIRE_POWER =3;
-        FIRE_POWER = Math.min(Math.min(getEnergy() / 6d, 1000d / enemy.distance), enemy.energy / 3d);
+        FIRE_POWER =2;
+        //FIRE_POWER = Math.min(Math.min(getEnergy() / 6d, 1000d / enemy.distance), enemy.energy / 3d);
         FIRE_SPEED = Rules.getBulletSpeed(FIRE_POWER);
         setFire(FIRE_POWER);
+    }
+
+    public void doMovement(ScannedRobotEvent e)
+    {
+        double travel;
+        double angle;
+        Point2D.Double myP = new Point2D.Double(getX(), getY());
+        Point2D.Double enemyP = project(myP, enemy.absoluteBearing, e.getDistance());
+        myP.setLocation(getX(), getY());
+        travel = Math.max( 60, myP.distance(enemyP) * 0.35);
+        angle = Utils.normalRelativeAngle( Math.atan2( myP.getX() - enemy.x, myP.getY() - enemy.y) - getHeadingRadians());
+        setTurnRightRadians(Math.atan( Math.tan(angle)));
+        setMaxVelocity( 10 - (4 * Math.abs(getTurnRemainingRadians())));
+        setAhead( (angle == Math.atan( Math.tan( angle)) ? -1.0 : 1.0) * travel);
     }
 
     public void trackHim() {
