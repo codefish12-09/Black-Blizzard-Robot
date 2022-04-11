@@ -18,6 +18,7 @@ public class Team2 extends AdvancedRobot {
     //initial
 
     static Boolean hithithit = false;
+    boolean movingForward;
     team2.enemyState enemy = new team2.enemyState();
     //pattern match
     private static final int MAX_PATTERN_LENGTH = 30;
@@ -35,10 +36,10 @@ public class Team2 extends AdvancedRobot {
     public void run() {
         setAdjustGunForRobotTurn(true);//车炮分离
         setAdjustRadarForGunTurn(true);//枪和雷达分离
-        setBodyColor(Color.BLACK);
+        setBodyColor(Color.WHITE);
         setGunColor(Color.WHITE);
         setRadarColor(Color.BLACK);
-        setScanColor(Color.BLACK);
+        setScanColor(Color.WHITE);
         enemyHistory = "";
         movement = Double.POSITIVE_INFINITY;
         setTurnRadarRight(400);//雷达扫描角度
@@ -65,9 +66,30 @@ public class Team2 extends AdvancedRobot {
     }
 
     //当机器人被炮弹击中
-    public void onHitByBullet(HitByBulletEvent e) {
-        setTurnRadarRight(400);
+    public void onHitByBullet(HitByBulletEvent e)
+    {
+        if(getX()>150&&getY()>150&&enemy.x-getX()>150&&enemy.y-getY()>150)
+        {
+            double dist=150;
+            double a=normalizeBearing(90 - (getHeading() - e.getHeading()));
+            if(Math.abs(a)>Math.PI/2)
+            {
+                a=normalizeBearing(a+Math.PI);
+            }
+            setTurnRight(a);
+            setAhead(dist);
+            dist *= -1;
+        }
     }
+    public double normalizeBearing( double angle )
+    {
+        if ( angle < -Math.PI )
+            angle += 2*Math.PI;
+        if ( angle > Math.PI )
+            angle -= 2*Math.PI;
+        return angle;
+    }
+
 
     //当机器人击中另一个机器人
     public void onHitRobot(HitRobotEvent e) {
@@ -113,8 +135,8 @@ public class Team2 extends AdvancedRobot {
     }
 
     public void smartFire() {
-        //FIRE_POWER =3d;
-        FIRE_POWER = Math.min(Math.min(getEnergy() / 6d, 1000d / enemy.distance), enemy.energy / 3d);
+        FIRE_POWER =3;
+        //FIRE_POWER = Math.min(Math.min(getEnergy() / 6d, 1000d / enemy.distance), enemy.energy / 3d);
         FIRE_SPEED = Rules.getBulletSpeed(FIRE_POWER);
         setFire(FIRE_POWER);
     }
@@ -122,7 +144,7 @@ public class Team2 extends AdvancedRobot {
     public void trackHim() {
         double RadarOffset;
         RadarOffset = Utils.normalRelativeAngle(enemy.absoluteBearing - getRadarHeadingRadians());
-        setTurnRadarRightRadians(RadarOffset * 1.2);
+        setTurnRadarRightRadians(RadarOffset * 2);
     }
 
     private void record(int thisStep) {
